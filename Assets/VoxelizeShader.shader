@@ -44,7 +44,7 @@ Shader "Voxelize"
 				// **************************************************************
 
 				float4x4 zMVP;
-				RWTexture3D<float> media;
+				RWTexture3D<float> media : register(u1);
 				
 				// **************************************************************
 				// Shader Programs												*
@@ -122,7 +122,7 @@ Shader "Voxelize"
 					media[floor(unswizzled)] = 0;
 					
 					
-					discard;
+					
 					return float4(0,0,0,0);
 				}
 

@@ -2,41 +2,70 @@
 using System.Collections;
 
 public class HyperEcho : MonoBehaviour {
-	public RenderTexture media;
-	public int size = 512;
+	public RenderTexture media, current, previous;
+    public ComputeShader echoCompute;
+    public float timeStep, distanceStep, speedOfSound, damping, frequency, amplitude;
+    private bool phase = false;
+	public int size = 256;
 
 	// Use this for initialization
 	void Start () {
-		//check if those buffers exist
-		DestroyImmediate (media);
 
+        setupTexture3D(ref media, "Media");
+        setupTexture3D(ref current, "Current");
+        setupTexture3D(ref previous, "Previous");
 
-		//make those buffers
-		media = new RenderTexture(this.size, this.size, 0 ,RenderTextureFormat.RFloat);
-		media.enableRandomWrite = true;
-		media.isVolume = true;
-		media.volumeDepth = size;
-		media.Create ();
-
-		Shader.SetGlobalTexture (0, media);
-
-	
+        Voxelize.media = media;
+    
+        
 	}
+
+    void setupTexture3D(ref RenderTexture tex, string name)
+    {
+        //check if those buffers exist
+        DestroyImmediate(tex);
+
+        //make those buffers
+        tex = new RenderTexture(this.size, this.size, 0, RenderTextureFormat.RFloat);
+        tex.enableRandomWrite = true;
+        tex.isVolume = true;
+        tex.volumeDepth = size;
+        tex.Create();
+        tex.SetGlobalShaderProperty(name);
+    }
 
 	void OnDisable(){
 
-		DestroyImmediate (media);
+		DestroyImmediate(media);
+        DestroyImmediate(current);
+        DestroyImmediate(previous);
+        Graphics.ClearRandomWriteTargets();
 	}
 
 	// Update is called once per frame
 	void Update () {
-	
+        echoCompute.SetFloat("timeStep", timeStep);
+        echoCompute.SetFloat("distanceStep", distanceStep);
+        echoCompute.SetFloat("speedOfSound", speedOfSound);
+        echoCompute.SetFloat("damping", damping);
+        echoCompute.SetFloat("chaos", Mathf.Sin(Time.timeSinceLevelLoad * frequency) * amplitude );
+ 
+
+        echoCompute.SetTexture(0, "Media", media);
+        echoCompute.SetTexture(0, "Current", phase ? current : previous);
+        echoCompute.SetTexture(0, "Previous", phase ? previous : current);
+       
+
+        phase = !phase;
+
+        echoCompute.Dispatch(0, 32, 32, 32);
+
+
 	}
 
 	void OnPreCull(){
 
-		Vector3 vector = camera.ViewportToWorldPoint(new Vector3(0f, 0f, camera.nearClipPlane));
-		Raymarching.rayMat.SetVector("screenCorner", new Vector4(vector.x, vector.y, vector.z));
+		
 
 
 

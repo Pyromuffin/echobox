@@ -35,8 +35,9 @@
 				float4 cameraRight;
 				float StepSize;
 				float4 cameraWorldSize;
+				float worldSize;
 				
-				sampler3D media;
+				sampler3D Current;
 			
 				float4 frag(v2f IN) : COLOR {
 					//calculate projective texture coordinates
@@ -59,10 +60,13 @@
 				    for(int i = 0; i < 100; i++)
 				    {
 				        pos.w = 0;
-				        value = tex3Dlod(media, pos).r;
-				              
-				        src = (float4)value;
-				        src.a *= .5f; //reduce the alpha to have a more transparent result 
+				        value = tex3Dlod(Current, pos/worldSize).r;
+				        if(value < 0)
+							 src = float4(0,abs(value),0,abs(value));
+						else
+							src =  float4(value,0,0,value);
+							    
+						src.a *= .5f; //reduce the alpha to have a more transparent result 
 				         
 				        //Front to back blending
 				        // dst.rgb = dst.rgb + (1 - dst.a) * src.a * src.rgb

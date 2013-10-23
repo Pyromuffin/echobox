@@ -1,0 +1,9 @@
+C:\Users\Kelly\Documents\GitHub\echobox\Temp\UnityVS_bin\Debug\Assembly-UnityScript-firstpass.dll
+C:\Users\Kelly\Documents\GitHub\echobox\Temp\UnityVS_bin\Debug\Assembly-UnityScript-firstpass.pdb
+C:\Users\Kelly\Documents\GitHub\echobox\Temp\UnityVS_bin\Debug\UnityEditor.dll
+C:\Users\Kelly\Documents\GitHub\echobox\Temp\UnityVS_bin\Debug\UnityEngine.dll
+C:\Users\Kelly\Documents\GitHub\echobox\Temp\UnityVS_bin\Debug\UnityEngine.xml
+C:\Users\Kelly\Documents\GitHub\echobox\Temp\UnityVS_bin\Debug\UnityEditor.xml
+C:\Users\Kelly\Documents\GitHub\echobox\obj\Debug\UnityVS.echobox.UnityScript.Plugins.unityprojResolveAssemblyReference.cache
+C:\Users\Kelly\Documents\GitHub\echobox\obj\Debug\Assembly-UnityScript-firstpass.dll
+C:\Users\Kelly\Documents\GitHub\echobox\obj\Debug\Assembly-UnityScript-firstpass.pdb
