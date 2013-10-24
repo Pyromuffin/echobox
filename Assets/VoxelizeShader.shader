@@ -27,15 +27,14 @@ Shader "Voxelize"
 				struct GS_INPUT
 				{
 					float4	pos		: POSITION;
-				//	float3	normal	: NORMAL;
-				//	float2  tex0	: TEXCOORD0;
+
 				};
 
 				struct FS_INPUT
 				{
 					float4	pos		: POSITION;
-					//float3 col	: COLOR;
 					nointerpolation float4x4  perm : texcoord0;
+					float4 worldPos : COLOR;
 				};
 
 
@@ -44,7 +43,7 @@ Shader "Voxelize"
 				// **************************************************************
 
 				float4x4 zMVP;
-				RWTexture3D<float> media : register(u1);
+				RWTexture3D<float> Media : register(u1);
 				
 				// **************************************************************
 				// Shader Programs												*
@@ -56,8 +55,6 @@ Shader "Voxelize"
 					GS_INPUT output = (GS_INPUT)0;
 
 					output.pos =  mul(_Object2World,v.vertex);
-					//output.normal = v.normal;
-					//output.tex0 = float2(0, 0);
 
 					return output;
 				}
@@ -81,6 +78,7 @@ Shader "Voxelize"
 				
 					float4x4 perm;
 					FS_INPUT pIn;
+
 					if(xDot > yDot && xDot > zDot){
 						//pIn.col = float3(1,0,0);
 						perm = float4x4(0,1,0,0, 0,0,1,0, 1,0,0,0 ,0,0,0,1);
@@ -95,35 +93,39 @@ Shader "Voxelize"
 					}
 					
 					pIn.perm = perm;
-	
+					
 					zMVP = mul( zMVP,perm);
 					
 					pIn.pos = mul(zMVP, p[0].pos);
-					//pIn.tex0 = float2(1.0f, 0.0f);
+					pIn.worldPos = mul(perm, p[0].pos);
 					triStream.Append(pIn);
 
 					pIn.pos =  mul(zMVP, p[1].pos);
-					//pIn.tex0 = float2(1.0f, 1.0f);
+					pIn.worldPos = mul(perm, p[1].pos);
 					triStream.Append(pIn);
 
 					pIn.pos =  mul(zMVP, p[2].pos);
-					//pIn.tex0 = float2(0.0f, 0.0f);
+					pIn.worldPos = mul(perm, p[2].pos);
 					triStream.Append(pIn);
 
 				}
 
-
+				float linearIndex(float3 index){
+				
+					return (index.x + index.y * 256 + index.z * 65536 );
+				
+				}
 
 				// Fragment Shader -----------------------------------------------
 				float4 FS_Main(FS_INPUT input) : COLOR
 				{
 				
-					float3 unswizzled = mul(input.perm, input.pos).xyz;
-					media[floor(unswizzled)] = 0;
+					float3 unswizzled = mul(input.perm, input.worldPos).xyz;
+					Media[uint3(unswizzled)] = 10;
 					
 					
 					
-					return float4(0,0,0,0);
+					return float4(unswizzled/256 ,0);
 				}
 
 			ENDCG

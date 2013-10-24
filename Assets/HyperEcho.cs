@@ -2,7 +2,8 @@
 using System.Collections;
 
 public class HyperEcho : MonoBehaviour {
-	public RenderTexture media, current, previous;
+	public RenderTexture current, previous;
+    public RenderTexture media;
     public ComputeShader echoCompute;
     public float timeStep, distanceStep, speedOfSound, damping, frequency, amplitude;
     private bool phase = false;
@@ -11,12 +12,14 @@ public class HyperEcho : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
-        setupTexture3D(ref media, "Media");
         setupTexture3D(ref current, "Current");
         setupTexture3D(ref previous, "Previous");
-
+        setupTexture3D(ref media, "Media");
+        //media = new ComputeBuffer(256 * 256 * 256, 8);
         Voxelize.media = media;
-    
+
+        //echoCompute.SetBuffer(0, "Media", media);
+
         
 	}
 
@@ -36,7 +39,7 @@ public class HyperEcho : MonoBehaviour {
 
 	void OnDisable(){
 
-		DestroyImmediate(media);
+        DestroyImmediate(media);
         DestroyImmediate(current);
         DestroyImmediate(previous);
         Graphics.ClearRandomWriteTargets();
@@ -49,7 +52,7 @@ public class HyperEcho : MonoBehaviour {
         echoCompute.SetFloat("speedOfSound", speedOfSound);
         echoCompute.SetFloat("damping", damping);
         echoCompute.SetFloat("chaos", Mathf.Sin(Time.timeSinceLevelLoad * frequency) * amplitude );
- 
+
 
         echoCompute.SetTexture(0, "Media", media);
         echoCompute.SetTexture(0, "Current", phase ? current : previous);
@@ -58,7 +61,7 @@ public class HyperEcho : MonoBehaviour {
 
         phase = !phase;
 
-        echoCompute.Dispatch(0, 32, 32, 32);
+        //echoCompute.Dispatch(0, 32, 32, 32);
 
 
 	}

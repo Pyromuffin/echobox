@@ -140,7 +140,7 @@ Transform:
   m_GameObject: {fileID: 81519178}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 128, y: 103.974945, z: 128}
-  m_LocalScale: {x: 27.8532619, y: 1, z: 34.3638268}
+  m_LocalScale: {x: 84.8979797, y: 7.21786308, z: 74.7077103}
   m_Children: []
   m_Father: {fileID: 0}
 --- !u!1 &85020768
@@ -408,7 +408,7 @@ MonoBehaviour:
   corner: {x: 0, y: 0, z: 0}
   mainCamera: {fileID: 1507679325}
   size: {x: 0, y: 0}
-  stepSize: .5
+  stepSize: 2
   UL: {x: 0, y: 0, z: 0}
 --- !u!1001 &583295457
 Prefab:
@@ -469,6 +469,14 @@ Prefab:
       propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2000000, guid: 9d4133d5d30b644bd87802a347eaccbe, type: 2}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2000000, guid: 9d4133d5d30b644bd87802a347eaccbe, type: 2}
+      propertyPath: m_CullingMask.m_Bits
+      value: 256
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 9d4133d5d30b644bd87802a347eaccbe, type: 2}
   m_RootGameObject: {fileID: 85020768}
@@ -509,7 +517,7 @@ Camera:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1217747932}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_ClearFlags: 1
   m_BackGroundColor: {r: .192156866, g: .301960796, b: .474509805, a: .0196078438}
@@ -519,11 +527,11 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: -256
-  far clip plane: 256
+  near clip plane: -128
+  far clip plane: 128
   field of view: 80.0999985
   orthographic: 1
-  orthographic size: 256
+  orthographic size: 128
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
@@ -632,7 +640,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 256
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_HDR: 0
@@ -659,9 +667,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85fabab34a31902439a926a65e5980f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  media: {fileID: 0}
   current: {fileID: 0}
   previous: {fileID: 0}
+  media: {fileID: 0}
   echoCompute: {fileID: 7200000, guid: cc8a54728be08be46b11d46840b0afae, type: 3}
   timeStep: .00033000001
   distanceStep: 1.79999995

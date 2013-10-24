@@ -12,12 +12,18 @@ float speedOfSound;
 float damping;
 float chaos;
 
+	uint linearIndex(uint3 index){
+				
+		return index.x + index.y * 256 + index.z * 65536;
+				
+	}
+
 [numthreads(8,8,8)]
-void CSMain (uint3 id : SV_DispatchThreadID)
+void CSMain (uint3 id : SV_DispatchThreadID, uint gid : SV_GroupIndex)
 {
    
 	float media = Media[id];
-	//media = 300;
+
 
 	float A = (media * timeStep)/distanceStep;
 	A = A*A;
