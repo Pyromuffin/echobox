@@ -20,7 +20,7 @@ public class Voxelize : MonoBehaviour {
 		Matrix4x4 MVP = P * V;
 		Shader.SetGlobalMatrix("zMVP", MVP);
 
-       
+
        
 	}
 
@@ -28,7 +28,8 @@ public class Voxelize : MonoBehaviour {
     void Update()
     {
         Graphics.SetRenderTarget(media);
-        GL.Clear(true, true, Color.black);
+        GL.Clear(true, true, new Color(300,300,300));
+
         Graphics.SetRandomWriteTarget(1, media);
         camera.RenderWithShader(voxelizeShader, "");
         Graphics.ClearRandomWriteTargets();

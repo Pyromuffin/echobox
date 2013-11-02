@@ -2,9 +2,9 @@
 using System.Collections;
 
 public class HyperEcho : MonoBehaviour {
-	public RenderTexture current, previous;
-    public RenderTexture media;
+    public RenderTexture current, previous, media, depth;
     public ComputeShader echoCompute;
+    public Shader depthShader;
     public float timeStep, distanceStep, speedOfSound, damping, frequency, amplitude;
     private bool phase = false;
 	public int size = 256;
@@ -15,11 +15,15 @@ public class HyperEcho : MonoBehaviour {
         setupTexture3D(ref current, "Current");
         setupTexture3D(ref previous, "Previous");
         setupTexture3D(ref media, "Media");
-        //media = new ComputeBuffer(256 * 256 * 256, 8);
+
+        camera.depthTextureMode = DepthTextureMode.Depth;
+
+        //depth = new RenderTexture(Screen.width, Screen.height, 0, RenderTextureFormat.RFloat);
+       // depth.SetGlobalShaderProperty("_Depth");
+
         Voxelize.media = media;
 
-        //echoCompute.SetBuffer(0, "Media", media);
-
+        
         
 	}
 
@@ -34,7 +38,7 @@ public class HyperEcho : MonoBehaviour {
         tex.isVolume = true;
         tex.volumeDepth = size;
         tex.Create();
-        tex.SetGlobalShaderProperty(name);
+       // tex.SetGlobalShaderProperty(name);
     }
 
 	void OnDisable(){
@@ -42,7 +46,7 @@ public class HyperEcho : MonoBehaviour {
         DestroyImmediate(media);
         DestroyImmediate(current);
         DestroyImmediate(previous);
-        Graphics.ClearRandomWriteTargets();
+       
 	}
 
 	// Update is called once per frame
@@ -57,20 +61,20 @@ public class HyperEcho : MonoBehaviour {
         echoCompute.SetTexture(0, "Media", media);
         echoCompute.SetTexture(0, "Current", phase ? current : previous);
         echoCompute.SetTexture(0, "Previous", phase ? previous : current);
-       
-
+        Shader.SetGlobalTexture("Current", phase ? current : previous);
         phase = !phase;
 
-        //echoCompute.Dispatch(0, 32, 32, 32);
+        /*
+        camera.targetTexture = depth;
+        camera.cullingMask = ~(1 << LayerMask.NameToLayer("raymarching box"));
+        camera.RenderWithShader(depthShader, "");
+        camera.targetTexture = null;
+        camera.cullingMask = 1 << LayerMask.NameToLayer("raymarching box");
+        */
+         echoCompute.Dispatch(0, 32, 32, 32);
 
 
 	}
 
-	void OnPreCull(){
 
-		
-
-
-
-	}
 }	

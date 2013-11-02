@@ -3,11 +3,11 @@
 		
 	}
 	SubShader {
-		Tags { "RenderType"="Opaque" }
+		Tags { "RenderType"="Opaque" "Queue" = "Geometry+1" }
 		LOD 200
 		
 		Pass {
-		cull front zwrite off ztest always  
+		Lighting Off Cull front ZTest Always ZWrite Off Fog { Mode Off}  
 			CGPROGRAM
 
 				#pragma target 5.0
@@ -19,6 +19,7 @@
 					float4 pos : SV_POSITION;
 					float3 worldPos : texcoord0;
 					float4 screenPos : texcoord1;
+					float2 depth : texcoord2;
 				};
 			
 			
@@ -27,6 +28,7 @@
 					o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
 					o.worldPos = mul(_Object2World, v.vertex);
 					o.screenPos = ComputeScreenPos(o.pos);
+					COMPUTE_EYEDEPTH(o.depth);
 					return o;
 				}
 			
@@ -37,13 +39,14 @@
 				float4 cameraWorldSize;
 				float worldSize;
 				 
-				sampler3D Media;
+				sampler3D Current;
+				sampler2D _CameraDepthTexture;
 			
 				float4 frag(v2f IN) : COLOR {
-					//calculate projective texture coordinates
-				    //used to project the front and back position textures onto the cube
-				    float2 uv = IN.screenPos.xy/IN.screenPos.w;
 				    
+					float2 uv = IN.screenPos.xy/IN.screenPos.w;
+				    float depth = LinearEyeDepth(tex2D(_CameraDepthTexture, uv));
+
 				    float3 front = screenCorner.xyz + (uv.x * cameraWorldSize.x * cameraRight.xyz) + (uv.y * cameraWorldSize.y * cameraUp.xyz);
 				    float3 back = IN.worldPos.xyz;
 				 
@@ -55,18 +58,18 @@
 				 
 				    float value = 0;
 				 
-				    float3 Step = dir * StepSize;
+				    float3 Step = dir * StepSize; 
 				 
-				    for(int i = 0; i < 100; i++)
+				    for(int i = 0; i < 200; i++)
 				    {
 				        pos.w = 0;
-				        value = tex3Dlod(Media, pos/worldSize).r;
+				        value = tex3Dlod(Current, pos/worldSize).r;
 				        if(value < 0)
 							 src = float4(0,abs(value),0,abs(value));
 						else
 							src =  float4(value,0,0,value);
 							    
-						src.a *= .5f; //reduce the alpha to have a more transparent result 
+						src.a *= .1f; //reduce the alpha to have a more transparent result 
 				         
 				        //Front to back blending
 				        // dst.rgb = dst.rgb + (1 - dst.a) * src.a * src.rgb
@@ -77,6 +80,8 @@
 				        //break from the loop when alpha gets high enough
 				        if(dst.a >= .95f)
 				            break; 
+						if(length(pos - front) > depth)
+							break;
 				     
 				        //advance the current position
 				        pos.xyz += Step;
@@ -84,7 +89,7 @@
 				        //break if the position is greater than <1, 1, 1>
 				    
 				    }
-				 
+					
 				    return dst;
 				}
 			ENDCG

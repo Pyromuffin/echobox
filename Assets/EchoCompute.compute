@@ -23,9 +23,9 @@ void CSMain (uint3 id : SV_DispatchThreadID, uint gid : SV_GroupIndex)
 {
    
 	float media = Media[id];
+	//media = 300;
 
-
-	float A = (media * timeStep)/distanceStep;
+	float A = (media * timeStep )/distanceStep;
 	A = A*A;
 	float current = Current[id];
 	float previous = Previous[id];
@@ -40,7 +40,11 @@ void CSMain (uint3 id : SV_DispatchThreadID, uint gid : SV_GroupIndex)
 	if(all(id == uint3(128,128,128) ) )
 		current = chaos;
 
-    float next = current + (1-(damping*timeStep)) * (current- previous) + A * (left + right - (6* current) + down + up + behind + forward);
+	float next;
+	if(media == speedOfSound)
+		next = current + (1-(damping*timeStep)) * (current- previous) + A * (left + right - (6* current) + down + up + behind + forward);
+	else
+		next = 0;
+
 	Previous[id] = next;
-	Media[id] = speedOfSound;
 }

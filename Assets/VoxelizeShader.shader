@@ -33,8 +33,8 @@ Shader "Voxelize"
 				struct FS_INPUT
 				{
 					float4	pos		: POSITION;
-					nointerpolation float4x4  perm : texcoord0;
-					float4 worldPos : COLOR;
+				
+					float4 worldPos : texcoord0;
 				};
 
 
@@ -76,56 +76,61 @@ Shader "Voxelize"
 					float yDot = abs( dot(normal,float3(0,1,0)));
 					float zDot = abs( dot(normal,float3(0,0,1)));
 				
-					float4x4 perm;
+					//float4x4 perm;
 					FS_INPUT pIn;
+					float4 p0world = p[0].pos;
+					float4 p1world = p[1].pos;
+					float4 p2world = p[2].pos;
 
 					if(xDot > yDot && xDot > zDot){
-						//pIn.col = float3(1,0,0);
-						perm = float4x4(0,1,0,0, 0,0,1,0, 1,0,0,0 ,0,0,0,1);
+					
+						p[0].pos = p[0].pos.yzxw;
+						p[1].pos = p[1].pos.yzxw;
+						p[2].pos = p[2].pos.yzxw;
+						//perm = float4x4(0,1,0,0, 0,0,1,0, 1,0,0,0 ,0,0,0,1);
 					}
 					else if(yDot > xDot && yDot > zDot){
-						//pIn.col = float3(0,1,0);
-						perm = float4x4 (0,0,1,0, 1,0,0,0, 0,1,0,0 ,0,0,0,1);
+						p[0].pos = p[0].pos.zxyw;
+						p[1].pos = p[1].pos.zxyw;
+						p[2].pos = p[2].pos.zxyw;
+					
+						//perm = float4x4 (0,0,1,0, 1,0,0,0, 0,1,0,0 ,0,0,0,1);
 					}
-					else{
+					//else{
 						//pIn.col = float3(0,0,1);
-						perm = float4x4(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1);
-					}
+						//perm = float4x4(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1);
+					//}
 					
-					pIn.perm = perm;
+					//pIn.perm = perm;
 					
-					zMVP = mul( zMVP,perm);
+					//zMVP = mul( zMVP, perm);
 					
 					pIn.pos = mul(zMVP, p[0].pos);
-					pIn.worldPos = mul(perm, p[0].pos);
+					pIn.worldPos = p0world;
 					triStream.Append(pIn);
 
 					pIn.pos =  mul(zMVP, p[1].pos);
-					pIn.worldPos = mul(perm, p[1].pos);
+					pIn.worldPos = p1world;
 					triStream.Append(pIn);
 
 					pIn.pos =  mul(zMVP, p[2].pos);
-					pIn.worldPos = mul(perm, p[2].pos);
+					pIn.worldPos = p2world;
 					triStream.Append(pIn);
 
 				}
 
-				float linearIndex(float3 index){
-				
-					return (index.x + index.y * 256 + index.z * 65536 );
-				
-				}
+		
 
 				// Fragment Shader -----------------------------------------------
 				float4 FS_Main(FS_INPUT input) : COLOR
 				{
 				
-					float3 unswizzled = mul(input.perm, input.worldPos).xyz;
-					Media[uint3(unswizzled)] = 10;
+					//float3 unswizzled = mul(input.perm, input.worldPos).xyz;
+					Media[uint3(input.worldPos.xyz)] = 0;
 					
 					
-					
-					return float4(unswizzled/256 ,0);
+					discard;
+					return float4(1,1,1 ,0);
 				}
 
 			ENDCG
