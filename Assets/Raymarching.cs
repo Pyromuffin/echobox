@@ -34,6 +34,22 @@ public class Raymarching : MonoBehaviour
         Gizmos.DrawWireCube(transform.position, transform.localScale);
     }
 
+
+    public void doCamera(Camera cam)
+    {
+        Vector3 up = cam.transform.up;
+        Vector3 right = cam.transform.right;
+
+        rayMat.SetVector("cameraUp", new Vector4(up.x, up.y, up.z));
+        rayMat.SetVector("cameraRight", new Vector4(right.x, right.y, right.z));
+        rayMat.SetFloat("StepSize", this.stepSize);
+        //rayMat.SetFloat("worldSize", transform.localScale.x);
+
+        corner = cam.ViewportToWorldPoint(new Vector3(0f, 0f, cam.nearClipPlane));
+        rayMat.SetVector("screenCorner", new Vector4(corner.x, corner.y, corner.z));
+    }
+
+    /*
 	private void Update()
 	{
         if (Camera.current != null)
@@ -50,6 +66,8 @@ public class Raymarching : MonoBehaviour
             rayMat.SetVector("screenCorner", new Vector4(corner.x, corner.y, corner.z));
         }
     }
+    */
 }
+
 
 

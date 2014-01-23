@@ -55,7 +55,7 @@
 				    float4 dst = float4(0, 0, 0, 0);
 				    float4 src = 0;
 				 
-				    float value = 0;
+				    float4 value = float4(0,0,0,0);
 				 
 				    float3 Step = dir * StepSize; 
 				 
@@ -71,14 +71,12 @@
 						float4 relativePos =  ( (pos-128)	/64) + .5f;
 						relativePos.w = 0;
 
-				        value = tex3Dlod(Current, relativePos ).r;
+				        value = tex3Dlod(Current, relativePos );
 
-					if (value > 0) 
-						src = float4( 0, 0,0, abs(log(value)) );
-					else if (value < 0)
-						src = float4(0, 0,0, abs(log(abs(value))) );
-					else
-						src = 0;
+					//if (value != 0) 
+						src = abs(log(abs(value)));
+					//else
+						//src = 0;
 
 				
 

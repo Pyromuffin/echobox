@@ -2,11 +2,11 @@
 using System.Collections;
 
 public class HyperEcho : MonoBehaviour {
-    public RenderTexture current, previous, media, depth;
+    public RenderTexture current, previous, media, next;
     public ComputeShader echoCompute;
     public Shader depthShader;
     public float timeFactor, distanceStep, speedOfSound, damping, frequency, amplitude;
-    private bool phase = false;
+    private int phase = 0;
 	public int size = 256;
 
 	// Use this for initialization
@@ -15,8 +15,10 @@ public class HyperEcho : MonoBehaviour {
         setupTexture3D(ref current, "Current");
         setupTexture3D(ref previous, "Previous");
         setupTexture3D(ref media, "Media");
-
-        camera.depthTextureMode = DepthTextureMode.Depth;
+        setupTexture3D(ref next, "Next");
+        var camroids = GetComponentsInChildren<Camera>();
+        camroids[0].depthTextureMode = DepthTextureMode.Depth;
+        camroids[1].depthTextureMode = DepthTextureMode.Depth;
 
         //depth = new RenderTexture(Screen.width, Screen.height, 0, RenderTextureFormat.RFloat);
        // depth.SetGlobalShaderProperty("_Depth");
@@ -33,12 +35,12 @@ public class HyperEcho : MonoBehaviour {
         DestroyImmediate(tex);
 
         //make those buffers
-        tex = new RenderTexture(this.size, this.size, 0, RenderTextureFormat.RFloat);
+        tex = new RenderTexture(this.size, this.size, 0, RenderTextureFormat.ARGBFloat);
         tex.enableRandomWrite = true;
         tex.isVolume = true;
         tex.volumeDepth = size;
         tex.Create();
-       // tex.SetGlobalShaderProperty(name);
+        //tex.SetGlobalShaderProperty(name);
     }
 
 	void OnDisable(){
@@ -46,23 +48,58 @@ public class HyperEcho : MonoBehaviour {
         DestroyImmediate(media);
         DestroyImmediate(current);
         DestroyImmediate(previous);
+        DestroyImmediate(next);
        
 	}
-
+    float accumulator = 0;
+    Color color;
 	// Update is called once per frame
 	void FixedUpdate () {
         echoCompute.SetFloat("timeStep", Time.fixedDeltaTime/ timeFactor);
         echoCompute.SetFloat("distanceStep", distanceStep);
         echoCompute.SetFloat("speedOfSound", speedOfSound);
         echoCompute.SetFloat("damping", damping);
-        echoCompute.SetFloat("chaos", Mathf.Sin(Time.timeSinceLevelLoad * frequency) * amplitude );
+        if (accumulator > 1)
+        {
+            color = new Color(Random.value, Random.value, Random.value);
+            accumulator = 0;
+        }
+        accumulator += Time.fixedDeltaTime * frequency;
+
+        echoCompute.SetVector("chaos", new Vector4( color.r, color.g, color.b, Mathf.Sin(Time.timeSinceLevelLoad * frequency * amplitude) ) );
 
 
         echoCompute.SetTexture(0, "Media", media);
-        echoCompute.SetTexture(0, "Current", phase ? current : previous);
-        echoCompute.SetTexture(0, "Previous", phase ? previous : current);
-        Shader.SetGlobalTexture("Current", phase ? current : previous);
-        phase = !phase;
+        if (phase == 0)
+        {
+            echoCompute.SetTexture(0, "Next", next);
+            echoCompute.SetTexture(0, "Current", current );
+            echoCompute.SetTexture(0, "Previous", previous );
+            
+            Shader.SetGlobalTexture("Current", next );
+            phase++;
+        }
+        else if (phase == 1)
+        {
+            echoCompute.SetTexture(0, "Next", previous);
+            echoCompute.SetTexture(0, "Current", next);
+            echoCompute.SetTexture(0, "Previous", current);
+            
+            Shader.SetGlobalTexture("Current", previous);
+            phase++;
+        }
+
+        else if (phase == 2)
+        {
+            echoCompute.SetTexture(0, "Next", current);
+            echoCompute.SetTexture(0, "Current", previous);
+            echoCompute.SetTexture(0, "Previous", next);
+            
+            Shader.SetGlobalTexture("Current", current);
+            phase = 0;
+        }
+        
+        
 
         /*
         camera.targetTexture = depth;

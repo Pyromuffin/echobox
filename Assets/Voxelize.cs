@@ -28,7 +28,7 @@ public class Voxelize : MonoBehaviour {
     void FixedUpdate()
     {
         Graphics.SetRenderTarget(media);
-        GL.Clear(true, true, new Color(300,300,300));
+        GL.Clear(true, true, new Color(300,300,300,300));
 
         Graphics.SetRandomWriteTarget(1, media);
         camera.RenderWithShader(voxelizeShader, "");
