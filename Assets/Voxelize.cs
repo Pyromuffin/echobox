@@ -25,7 +25,7 @@ public class Voxelize : MonoBehaviour {
 	}
 
 
-    void Update()
+    void FixedUpdate()
     {
         Graphics.SetRenderTarget(media);
         GL.Clear(true, true, new Color(300,300,300));

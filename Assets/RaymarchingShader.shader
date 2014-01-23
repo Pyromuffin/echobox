@@ -3,11 +3,12 @@
 		
 	}
 	SubShader {
-		Tags { "RenderType"="Opaque" "Queue" = "Geometry+1" }
+		Tags { "RenderType"="Transparent" }
 		LOD 200
 		
 		Pass {
-		Lighting Off Cull front ZTest Always ZWrite Off Fog { Mode Off}  
+			cull front ZTest always zwrite off
+			 Blend SrcAlpha OneMinusSrcAlpha
 			CGPROGRAM
 
 				#pragma target 5.0
@@ -19,7 +20,6 @@
 					float4 pos : SV_POSITION;
 					float3 worldPos : texcoord0;
 					float4 screenPos : texcoord1;
-					float2 depth : texcoord2;
 				};
 			
 			
@@ -28,7 +28,6 @@
 					o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
 					o.worldPos = mul(_Object2World, v.vertex);
 					o.screenPos = ComputeScreenPos(o.pos);
-					COMPUTE_EYEDEPTH(o.depth);
 					return o;
 				}
 			
@@ -62,14 +61,29 @@
 				 
 				    for(int i = 0; i < 200; i++)
 				    {
-				        pos.w = 0;
-				        value = tex3Dlod(Current, pos/worldSize).r;
-				        if(value < 0)
-							 src = float4(0,abs(value),0,abs(value));
-						else
-							src =  float4(value,0,0,value);
+				        
+						//128 128 128 -> .5, .5, .5
+						//144 144 144 -> 1,1,1,
+						//16, 16, 16 -> 1 1 1
+						// 0 0 0 -> .5 .5 .5
+						// -16, -16, -16  -> 0 ,0, 0						
+						// ( (worldPos - 128) /32 ) +.5f
+						float4 relativePos =  ( (pos-128)	/64) + .5f;
+						relativePos.w = 0;
+
+				        value = tex3Dlod(Current, relativePos ).r;
+
+					if (value > 0) 
+						src = float4( 0, 0,0, abs(log(value)) );
+					else if (value < 0)
+						src = float4(0, 0,0, abs(log(abs(value))) );
+					else
+						src = 0;
+
+				
+
 							    
-						src.a *= .1f; //reduce the alpha to have a more transparent result 
+						src.a *= .001f; //reduce the alpha to have a more transparent result 
 				         
 				        //Front to back blending
 				        // dst.rgb = dst.rgb + (1 - dst.a) * src.a * src.rgb
@@ -78,19 +92,21 @@
 				        dst = (1.0f - dst.a)*src + dst;     
 				     
 				        //break from the loop when alpha gets high enough
-				        if(dst.a >= .95f)
+				        if(dst.a >= .99)
 				            break; 
-						if(length(pos - front) > depth)
-							break;
+					
 				     
 				        //advance the current position
 				        pos.xyz += Step;
+						
+						if(length(pos - front) > depth)
+							break;
 				     
 				        //break if the position is greater than <1, 1, 1>
 				    
 				    }
 					
-				    return dst;
+				    return float4(dst.rgb, 1-dst.a);
 				}
 			ENDCG
 		}

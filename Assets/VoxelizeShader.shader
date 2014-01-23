@@ -66,17 +66,13 @@ Shader "Voxelize"
 				void GS_Main(triangle GS_INPUT p[3], inout TriangleStream<FS_INPUT> triStream)
 				{
 				
-				
 					//calculate normal
-				
-							
 					float3 normal = cross( (p[1].pos.xyz - p[0].pos.xyz ), (p[2].pos.xyz - p[0].pos.xyz) );
 					
 					float xDot = abs( dot(normal,float3(1,0,0)));
 					float yDot = abs( dot(normal,float3(0,1,0)));
 					float zDot = abs( dot(normal,float3(0,0,1)));
-				
-					//float4x4 perm;
+
 					FS_INPUT pIn;
 					float4 p0world = p[0].pos;
 					float4 p1world = p[1].pos;
@@ -87,23 +83,13 @@ Shader "Voxelize"
 						p[0].pos = p[0].pos.yzxw;
 						p[1].pos = p[1].pos.yzxw;
 						p[2].pos = p[2].pos.yzxw;
-						//perm = float4x4(0,1,0,0, 0,0,1,0, 1,0,0,0 ,0,0,0,1);
 					}
 					else if(yDot > xDot && yDot > zDot){
 						p[0].pos = p[0].pos.zxyw;
 						p[1].pos = p[1].pos.zxyw;
 						p[2].pos = p[2].pos.zxyw;
 					
-						//perm = float4x4 (0,0,1,0, 1,0,0,0, 0,1,0,0 ,0,0,0,1);
 					}
-					//else{
-						//pIn.col = float3(0,0,1);
-						//perm = float4x4(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1);
-					//}
-					
-					//pIn.perm = perm;
-					
-					//zMVP = mul( zMVP, perm);
 					
 					pIn.pos = mul(zMVP, p[0].pos);
 					pIn.worldPos = p0world;
@@ -119,18 +105,17 @@ Shader "Voxelize"
 
 				}
 
-		
-
-				// Fragment Shader -----------------------------------------------
 				float4 FS_Main(FS_INPUT input) : COLOR
 				{
-				
-					//float3 unswizzled = mul(input.perm, input.worldPos).xyz;
-					Media[uint3(input.worldPos.xyz)] = 0;
-					
+					//128 128 128 -> 128 128 128
+					// 144, 144, 144 -> 256, 256, 256
+					// 128 + ( (world pos - 128 ) * 128/16 )
+					// 112-> 0
+					float3 relativePos = 128 + ((input.worldPos.xyz - 128) * 128 / 32);
+					Media[uint3(relativePos)] = 0;
 					
 					discard;
-					return float4(1,1,1 ,0);
+					return float4(0,0,0,0);
 				}
 
 			ENDCG

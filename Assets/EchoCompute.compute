@@ -41,10 +41,10 @@ void CSMain (uint3 id : SV_DispatchThreadID, uint gid : SV_GroupIndex)
 		current = chaos;
 
 	float next;
-	if(media == speedOfSound)
+	//if(media == speedOfSound)
 		next = current + (1-(damping*timeStep)) * (current- previous) + A * (left + right - (6* current) + down + up + behind + forward);
-	else
-		next = 0;
+	//else
+		//next = 0;
 
 	Previous[id] = next;
 }

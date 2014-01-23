@@ -17,6 +17,7 @@ public class Raymarching : MonoBehaviour
 	// Methods
 	private void Start()
 	{
+        GetComponent<MeshRenderer>().enabled = true;
 		rayMat = base.gameObject.renderer.material;
 		this.mainCamera = Camera.main;
 		this.LL = this.mainCamera.ViewportToWorldPoint(new Vector3(0f, 0f, this.mainCamera.nearClipPlane));
@@ -27,7 +28,12 @@ public class Raymarching : MonoBehaviour
 		this.size = new Vector2(vector.magnitude, vector2.magnitude);
 		rayMat.SetVector("cameraWorldSize", new Vector4(this.size.x, this.size.y));
 	}
-	
+
+    void OnDrawGizmos()
+    {
+        Gizmos.DrawWireCube(transform.position, transform.localScale);
+    }
+
 	private void Update()
 	{
         if (Camera.current != null)

@@ -5,7 +5,7 @@ public class HyperEcho : MonoBehaviour {
     public RenderTexture current, previous, media, depth;
     public ComputeShader echoCompute;
     public Shader depthShader;
-    public float timeStep, distanceStep, speedOfSound, damping, frequency, amplitude;
+    public float timeFactor, distanceStep, speedOfSound, damping, frequency, amplitude;
     private bool phase = false;
 	public int size = 256;
 
@@ -50,8 +50,8 @@ public class HyperEcho : MonoBehaviour {
 	}
 
 	// Update is called once per frame
-	void Update () {
-        echoCompute.SetFloat("timeStep", timeStep);
+	void FixedUpdate () {
+        echoCompute.SetFloat("timeStep", Time.fixedDeltaTime/ timeFactor);
         echoCompute.SetFloat("distanceStep", distanceStep);
         echoCompute.SetFloat("speedOfSound", speedOfSound);
         echoCompute.SetFloat("damping", damping);
