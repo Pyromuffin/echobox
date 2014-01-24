@@ -47,6 +47,7 @@ public enum SixenseButtons
 /// </remarks>
 public class SixenseInput : MonoBehaviour
 {
+	public GameObject ball;
 	/// <summary>
 	/// Controller objects provide access to Sixense controllers data.
 	/// </summary>
@@ -342,6 +343,10 @@ public class SixenseInput : MonoBehaviour
 								Controllers[i].HandBind = SixenseHands.RIGHT;
 								SixensePlugin.sixenseAutoEnableHemisphereTracking( i );
 								m_ControllerManagerState = ControllerManagerState.NONE;
+								var players = GameObject.FindGameObjectsWithTag("Player");
+								foreach(var p in players)
+									p.BroadcastMessage("enableSixense");
+									GameObject.Instantiate(ball, new Vector3(0,3,0), Quaternion.identity);
 								break;
 							}
 						}

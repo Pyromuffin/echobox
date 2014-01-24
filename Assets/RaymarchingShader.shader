@@ -83,18 +83,19 @@
 				    for(int i = 0; i < 100; i++)
 				    {
 				        
-						//128 128 128 -> .5, .5, .5
+						//128 128 128 -> .5, .5, .5g
+						//136, 136, 136 -> 1,1,1
 						//144 144 144 -> 1,1,1,
 						//16, 16, 16 -> 1 1 1
 						// 0 0 0 -> .5 .5 .5
 						// -16, -16, -16  -> 0 ,0, 0						
 						// ( (worldPos - 128) /32 ) +.5f
-						float4 relativePos =  ( (pos-128)	/64) + .5f;
+						float4 relativePos =  ( (pos-128)	/16) + .5f;
 						relativePos.w = 0;
 
 				        value = tex3Dlod(RayMarching, relativePos );
  
-						
+						//value.rgb = abs(value.rgb);	
 					
 						if (value.a != 0) 
 							value.a = abs(log(abs(value.a)));
@@ -112,7 +113,7 @@
 				        dst = (1.0f - dst.a)*src + dst;     
 				     
 				        //break from the loop when alpha gets high enough
-				        if(dst.a >= .99)
+				        if(dst.a >= .95)
 				            break; 
 					
 				     

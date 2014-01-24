@@ -32,9 +32,21 @@ void CSMain(uint3 id : SV_DispatchThreadID, uint gid : SV_GroupIndex)
 {
 
 	float4 media = Media[id];
-	//media = 300;
+	float speedInMedium;
+	if (media.a == 0){
+		//empty space
+		speedInMedium = speedOfSound;
+		media = 0;
+	}
+	else
+	{
+		//something is there and it's emissive
+		speedInMedium = speedOfSound;
 
-	float A = (media.a * timeStep) / distanceStep;
+	}
+	speedInMedium = speedOfSound;
+
+	float A = (speedInMedium * timeStep) / distanceStep;
 	A = A*A;
 	float4 current = Current[id];
 	float4 previous = Previous[id];
@@ -46,16 +58,10 @@ void CSMain(uint3 id : SV_DispatchThreadID, uint gid : SV_GroupIndex)
 	float4 behind = Current[id - uint3(0, 0, 1)];
 	float4 forward = Current[id + uint3(0, 0, 1)];
 
-	if (all(id == uint3(120, 128, 128)))
-		current = chaos;
-
-	if (all(id == uint3(136, 128, 128)))
-		current = chaos2;
-
-
+	
 	float4 next;
-	if(media.a == speedOfSound)
-		next = current + (1 - (damping*timeStep)) * (current - previous) + A * (left + right - (6 * current) + down + up + behind + forward);
+	if(speedInMedium == speedOfSound)
+		next = current + (1 - (damping*timeStep)) * (current - previous) + media + A * (left + right - (6 * current) + down + up + behind + forward) ;
 	else
 		next = 0;
 

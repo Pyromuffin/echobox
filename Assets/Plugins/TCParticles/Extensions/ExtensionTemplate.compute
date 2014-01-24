@@ -1,0 +1,58 @@
+//===============================================================
+//Obligatory defines 
+struct Particle
+{
+	float3 pos;		//position of the particle
+	float3 velocity; //Velocity of the particle
+	float baseSize; //Size when particle was spawned, in meters
+	float size;  //Current size of particle, in meters. Read only!
+	float life; //Range from 0...1, 0 when spawned, 1 if dead
+	float deltLife; //life that each seconds is added to the particle
+	float rotation; //Rotation in degrees of particle
+	float mass; //Mass is the responsivness to forces, 0 being unresponsive
+};
+RWStructuredBuffer<Particle> particles; //always MaxParticles in size
+//To use the built in DispatchExtension() method of the particle manager, this must be 128. Can change if you _really_ know what you're doing
+#define TCGroupSize 128
+
+//global parameters
+struct SystemParameters
+{
+	//All read only
+
+	//Don't touch:
+	int offset;
+	int maxParticles;
+
+	//Not interesting:
+	float3 constantForce;//constant force acting on particles 
+	float angularVelocity; //rotational velocity of particles
+	float damping; //Current damping of particle velocity
+	float velocitySampleScale; //Scale of velocity over lifetime texture sample
+
+	//Can use these:
+	float particleThickness; //'Thickness' of the particles used in collisions
+	float deltTime;//Delta time of the system simulation
+};
+StructuredBuffer<SystemParameters> systemParameters;
+
+
+uint GetId(uint id, SystemParameters syst) { return (id + syst.offset) % syst.maxParticles; }
+
+
+
+//===============================================================
+//Example kernel
+
+//pragma tells unity what kernels there are - don't forget this!
+#pragma kernel MyExtensionKernel
+
+float AccelSpeed; //set by CPU, see ExtensionTemplate.cs
+
+[numthreads(TCGroupSize, 1, 1)]
+void MyExtensionKernel(uint3 Gid : SV_GroupID, uint3 DTid : SV_DispatchThreadID, uint3 GTid : SV_GroupThreadID )
+{
+	//This example simply accelerates the particles
+	SystemParameters syst = systemParameters[0]; //Always read the system first, handles bunch of stuff
+	particles[GetId(DTid.x, syst)].velocity += AccelSpeed * syst.deltTime; //Note: Never read directly from DTid.x, but use GetId(). 
+}

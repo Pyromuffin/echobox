@@ -494,7 +494,7 @@ public class OVRDevice : MonoBehaviour
 	public static float CalculateAspectRatio()
 	{
 		if(Application.isEditor)
-			return (Screen.width * 0.5f) / Screen.height;
+			return (Screen.width/2 * 0.5f) / Screen.height;
 		else
 			return (HResolution * 0.5f) / VResolution;		
 	}

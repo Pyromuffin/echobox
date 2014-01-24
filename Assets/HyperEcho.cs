@@ -26,9 +26,6 @@ public class HyperEcho : MonoBehaviour {
         if(VR)
             camroids[1].depthTextureMode = DepthTextureMode.Depth;
 
-        //depth = new RenderTexture(Screen.width, Screen.height, 0, RenderTextureFormat.RFloat);
-       // depth.SetGlobalShaderProperty("_Depth");
-
         Voxelize.media = media;
 
      
