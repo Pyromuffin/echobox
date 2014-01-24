@@ -3,45 +3,55 @@
 
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
-Texture3D<float4> Current;
-Texture3D<float4> Previous;
-Texture3D<float4> Media;
-RWTexture3D<float4> Next;
+Texture3D<float2> Current;
+Texture3D<float2> Previous;
+Texture3D<float2> Media;
+RWTexture3D<float2> Next;
 float timeStep;
 float distanceStep;
 float speedOfSound;
 float damping;
-float4 chaos;
+float2 chaos;
+
+float4 alphaBlend(float4 src, float4 dst)
+{
+	src.rgb *= src.a;
+	return (1.0f - dst.a)*src + dst;
+}
 
 
 [numthreads(8,8,8)]
 void CSMain(uint3 id : SV_DispatchThreadID, uint gid : SV_GroupIndex)
 {
 
-	float4 media = Media[id];
+	float2 media = Media[id];
 	//media = 300;
 
-	float A = (media.a * timeStep) / distanceStep;
+	float A = (media.r * timeStep) / distanceStep;
 	A = A*A;
-	float4 current = Current[id];
-	float4 previous = Previous[id];
+	float2 current = Current[id];
+	float2 previous = Previous[id];
 
-	float4 left = Current[id - uint3(1, 0, 0)];
-	float4 right = Current[id + uint3(1, 0, 0)];
-	float4 up = Current[id + uint3(0, 1, 0)];
-	float4 down = Current[id - uint3(0, 1, 0)];
-	float4 behind = Current[id - uint3(0, 0, 1)];
-	float4 forward = Current[id + uint3(0, 0, 1)];
+	float2 left = Current[id - uint3(1, 0, 0)];
+	float2 right = Current[id + uint3(1, 0, 0)];
+	float2 up = Current[id + uint3(0, 1, 0)];
+	float2 down = Current[id - uint3(0, 1, 0)];
+	float2 behind = Current[id - uint3(0, 0, 1)];
+	float2 forward = Current[id + uint3(0, 0, 1)];
 
 	if (all(id == uint3(128, 128, 128)))
 		current = chaos;
 
 
-	float4 next;
+	float2 next;
 	//if(media == speedOfSound)
-	next = current + (1 - (damping*timeStep)) * (current - previous) + A * (left + right - (6 * current) + down + up + behind + forward);
+	next = current + (1 - (damping*timeStep)) * (current - previous) + A * (left + right.r - (6 * current) + down + up + behind + forward);
 	//else
 	//next = 0;
+	next.g = chaos.g;
+
+
 
 	Next[id] = next;
 }
+

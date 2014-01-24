@@ -35,7 +35,8 @@ public class HyperEcho : MonoBehaviour {
         DestroyImmediate(tex);
 
         //make those buffers
-        tex = new RenderTexture(this.size, this.size, 0, RenderTextureFormat.ARGBFloat);
+        tex = new RenderTexture(this.size, this.size, 0, RenderTextureFormat.RGFloat);
+
         tex.enableRandomWrite = true;
         tex.isVolume = true;
         tex.volumeDepth = size;
@@ -52,21 +53,15 @@ public class HyperEcho : MonoBehaviour {
        
 	}
     float accumulator = 0;
-    Color color;
+    public Color color;
+    public float hue;
 	// Update is called once per frame
 	void FixedUpdate () {
         echoCompute.SetFloat("timeStep", Time.fixedDeltaTime/ timeFactor);
         echoCompute.SetFloat("distanceStep", distanceStep);
         echoCompute.SetFloat("speedOfSound", speedOfSound);
         echoCompute.SetFloat("damping", damping);
-        if (accumulator > 1)
-        {
-            color = new Color(Random.value, Random.value, Random.value);
-            accumulator = 0;
-        }
-        accumulator += Time.fixedDeltaTime * frequency;
-
-        echoCompute.SetVector("chaos", new Vector4( color.r, color.g, color.b, Mathf.Sin(Time.timeSinceLevelLoad * frequency * amplitude) ) );
+        echoCompute.SetVector("chaos", new Vector4(Mathf.Sin(Time.timeSinceLevelLoad * frequency) * amplitude, hue, 0, 0 ) );
 
 
         echoCompute.SetTexture(0, "Media", media);

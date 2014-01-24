@@ -30,6 +30,20 @@
 					o.screenPos = ComputeScreenPos(o.pos);
 					return o;
 				}
+
+				float3 Hue(float H)
+				{
+					float R = abs(H * 6 - 3) - 1;
+					float G = 2 - abs(H * 6 - 2);
+					float B = 2 - abs(H * 6 - 4);
+					return saturate(float3(R,G,B));
+				}
+
+				float3 HSVtoRGB(float3 HSV)
+				{
+					return ((Hue(HSV.x) - 1) * HSV.y + 1) * HSV.z;
+				}
+
 			
 				float4 screenCorner;
 				float4 cameraUp;
@@ -55,7 +69,7 @@
 				    float4 dst = float4(0, 0, 0, 0);
 				    float4 src = 0;
 				 
-				    float4 value = float4(0,0,0,0);
+				    float2 value = float2(0,0);
 				 
 				    float3 Step = dir * StepSize; 
 				 
@@ -71,10 +85,14 @@
 						float4 relativePos =  ( (pos-128)	/64) + .5f;
 						relativePos.w = 0;
 
-				        value = tex3Dlod(Current, relativePos );
+				        value = tex3Dlod(Current, relativePos ).rg;
 
+						
 					//if (value != 0) 
-						src = abs(log(abs(value)));
+						
+						value = abs(log(abs(value)));
+						float3 RGB = HSVtoRGB( float3(value.g,1,1) );
+						src = float4( RGB, value.r );
 					//else
 						//src = 0;
 
@@ -106,6 +124,8 @@
 					
 				    return float4(dst.rgb, 1-dst.a);
 				}
+
+			
 			ENDCG
 		}
 	}
