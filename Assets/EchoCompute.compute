@@ -3,20 +3,27 @@
 
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
-Texture3D<float2> Current;
-Texture3D<float2> Previous;
-Texture3D<float2> Media;
-RWTexture3D<float2> Next;
+Texture3D<float4> Current;
+Texture3D<float4> Previous;
+Texture3D<float4> Media;
+RWTexture3D<float4> Next;
+RWTexture3D<half4> RayMarching;
 float timeStep;
 float distanceStep;
 float speedOfSound;
 float damping;
-float2 chaos;
+float4 chaos;
+float4 chaos2;
 
-float4 alphaBlend(float4 src, float4 dst)
+float3 rgb2hsv(float3 c)
 {
-	src.rgb *= src.a;
-	return (1.0f - dst.a)*src + dst;
+	float4 K = float4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+	float4 p = c.g < c.b ? float4(c.bg, K.wz) : float4(c.gb, K.xy);
+	float4 q = c.r < p.x ? float4(p.xyw, c.r) : float4(c.r, p.yzx);
+
+	float d = q.x - min(q.w, q.y);
+	float e = 1.0e-10;
+	return float3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
 }
 
 
@@ -24,34 +31,35 @@ float4 alphaBlend(float4 src, float4 dst)
 void CSMain(uint3 id : SV_DispatchThreadID, uint gid : SV_GroupIndex)
 {
 
-	float2 media = Media[id];
+	float4 media = Media[id];
 	//media = 300;
 
-	float A = (media.r * timeStep) / distanceStep;
+	float A = (media.a * timeStep) / distanceStep;
 	A = A*A;
-	float2 current = Current[id];
-	float2 previous = Previous[id];
+	float4 current = Current[id];
+	float4 previous = Previous[id];
 
-	float2 left = Current[id - uint3(1, 0, 0)];
-	float2 right = Current[id + uint3(1, 0, 0)];
-	float2 up = Current[id + uint3(0, 1, 0)];
-	float2 down = Current[id - uint3(0, 1, 0)];
-	float2 behind = Current[id - uint3(0, 0, 1)];
-	float2 forward = Current[id + uint3(0, 0, 1)];
+	float4 left = Current[id - uint3(1, 0, 0)];
+	float4 right = Current[id + uint3(1, 0, 0)];
+	float4 up = Current[id + uint3(0, 1, 0)];
+	float4 down = Current[id - uint3(0, 1, 0)];
+	float4 behind = Current[id - uint3(0, 0, 1)];
+	float4 forward = Current[id + uint3(0, 0, 1)];
 
-	if (all(id == uint3(128, 128, 128)))
+	if (all(id == uint3(120, 128, 128)))
 		current = chaos;
 
-
-	float2 next;
-	//if(media == speedOfSound)
-	next = current + (1 - (damping*timeStep)) * (current - previous) + A * (left + right.r - (6 * current) + down + up + behind + forward);
-	//else
-	//next = 0;
-	next.g = chaos.g;
+	if (all(id == uint3(136, 128, 128)))
+		current = chaos2;
 
 
+	float4 next;
+	if(media.a == speedOfSound)
+		next = current + (1 - (damping*timeStep)) * (current - previous) + A * (left + right - (6 * current) + down + up + behind + forward);
+	else
+		next = 0;
 
 	Next[id] = next;
+	RayMarching[id] = next;
 }
 

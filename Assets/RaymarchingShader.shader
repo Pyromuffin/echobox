@@ -43,7 +43,13 @@
 				{
 					return ((Hue(HSV.x) - 1) * HSV.y + 1) * HSV.z;
 				}
-
+				
+				float3 hsv2rgb(float3 c)
+				{
+					float4 K = float4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+					float3 p = abs(frac(c.xxx + K.xyz) * 6.0 - K.www);
+					return c.z * lerp(K.xxx, saturate(p - K.xxx), c.y);
+				}
 			
 				float4 screenCorner;
 				float4 cameraUp;
@@ -52,7 +58,7 @@
 				float4 cameraWorldSize;
 				float worldSize;
 				 
-				sampler3D Current;
+				sampler3D RayMarching;
 				sampler2D _CameraDepthTexture;
 			
 				float4 frag(v2f IN) : COLOR {
@@ -69,11 +75,12 @@
 				    float4 dst = float4(0, 0, 0, 0);
 				    float4 src = 0;
 				 
-				    float2 value = float2(0,0);
+				    float4 value = float4(0,0,0,0);
 				 
 				    float3 Step = dir * StepSize; 
-				 
-				    for(int i = 0; i < 200; i++)
+					
+					
+				    for(int i = 0; i < 100; i++)
 				    {
 				        
 						//128 128 128 -> .5, .5, .5
@@ -85,20 +92,17 @@
 						float4 relativePos =  ( (pos-128)	/64) + .5f;
 						relativePos.w = 0;
 
-				        value = tex3Dlod(Current, relativePos ).rg;
-
+				        value = tex3Dlod(RayMarching, relativePos );
+ 
 						
-					//if (value != 0) 
-						
-						value = abs(log(abs(value)));
-						float3 RGB = HSVtoRGB( float3(value.g,1,1) );
-						src = float4( RGB, value.r );
-					//else
-						//src = 0;
+					
+						if (value.a != 0) 
+							value.a = abs(log(abs(value.a)));
+						else 
+							value.a = 0;
+					
+						src = value;
 
-				
-
-							    
 						src.a *= .001f; //reduce the alpha to have a more transparent result 
 				         
 				        //Front to back blending

@@ -230,7 +230,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &85020769
 Transform:
   m_ObjectHideFlags: 0
@@ -477,7 +477,7 @@ MonoBehaviour:
   corner: {x: 0, y: 0, z: 0}
   mainCamera: {fileID: 1507679325}
   size: {x: 0, y: 0}
-  stepSize: .100000001
+  stepSize: .200000003
   UL: {x: 0, y: 0, z: 0}
 --- !u!1 &538105938
 GameObject:
@@ -626,7 +626,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 100002, guid: 9d4133d5d30b644bd87802a347eaccbe, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2300000, guid: 9d4133d5d30b644bd87802a347eaccbe, type: 2}
       propertyPath: m_Enabled
@@ -688,7 +688,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &716457126
 Transform:
   m_ObjectHideFlags: 0
@@ -786,15 +786,20 @@ MonoBehaviour:
   previous: {fileID: 0}
   media: {fileID: 0}
   next: {fileID: 0}
+  RMtex: {fileID: 0}
   echoCompute: {fileID: 7200000, guid: cc8a54728be08be46b11d46840b0afae, type: 3}
   depthShader: {fileID: 4800000, guid: d860c59358ede7c4bbf6a637eff2f8d3, type: 3}
-  timeFactor: 50
+  timeFactor: 100
   distanceStep: .5
   speedOfSound: 300
   damping: 10
   frequency: 5
   amplitude: 100
   size: 256
+  VR: 1
+  hue: .5
+  color: {r: 0, g: 0, b: 0, a: 0}
+  color2: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &860972298
 GameObject:
   m_ObjectHideFlags: 0
@@ -826,6 +831,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 666d0bd0bed7e844ea8cb7a69f48d0df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  startSpeed: 100
 --- !u!54 &860972300
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -888,8 +894,8 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 860972298}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 125.440506, y: 125.980789, z: 117.968666}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 125.440506, y: 130.850098, z: 125.746254}
+  m_LocalScale: {x: 5, y: 5, z: 5}
   m_Children: []
   m_Father: {fileID: 0}
 --- !u!1 &1097936445
@@ -1060,6 +1066,44 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: .707106829, w: .707106829}
   m_LocalPosition: {x: 144, y: 128, z: 128}
   m_LocalScale: {x: 16, y: 1, z: 64}
+  m_Children: []
+  m_Father: {fileID: 0}
+--- !u!1 &1161752173
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1161752175}
+  - 114: {fileID: 1161752174}
+  m_Layer: 0
+  m_Name: MessengerHelper
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1161752174
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1161752173}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1161752175
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1161752173}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
 --- !u!1 &1217747932
@@ -1394,15 +1438,20 @@ MonoBehaviour:
   previous: {fileID: 0}
   media: {fileID: 0}
   next: {fileID: 0}
+  RMtex: {fileID: 0}
   echoCompute: {fileID: 7200000, guid: cc8a54728be08be46b11d46840b0afae, type: 3}
   depthShader: {fileID: 4800000, guid: d860c59358ede7c4bbf6a637eff2f8d3, type: 3}
-  timeFactor: 100
+  timeFactor: 50
   distanceStep: .5
   speedOfSound: 300
   damping: 10
-  frequency: 2
+  frequency: 5
   amplitude: 100
   size: 256
+  VR: 0
+  hue: .5
+  color: {r: .452530295, g: .77148515, b: .992647052, a: 0}
+  color2: {r: .820689678, g: 0, b: 1, a: 0}
 --- !u!1 &1842824033
 GameObject:
   m_ObjectHideFlags: 0
@@ -1621,6 +1670,10 @@ Prefab:
     - target: {fileID: 2000000, guid: ce816f2e6abb0504092c23ed9b970dfd, type: 2}
       propertyPath: far clip plane
       value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 100008, guid: ce816f2e6abb0504092c23ed9b970dfd, type: 2}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ce816f2e6abb0504092c23ed9b970dfd, type: 2}

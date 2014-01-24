@@ -112,7 +112,7 @@ Shader "Voxelize"
 					// 128 + ( (world pos - 128 ) * 128/16 )
 					// 112-> 0
 					float3 relativePos = 128 + ((input.worldPos.xyz - 128) * 128 / 32);
-					Media[uint3(relativePos)] = float2(0,0);
+					Media[uint3(relativePos)] = float4(0,0,0,0);
 					
 					discard;
 					return float4(0,0,0,0);
