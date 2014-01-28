@@ -48,6 +48,7 @@ public enum SixenseButtons
 public class SixenseInput : MonoBehaviour
 {
 	public GameObject ball;
+    public HyperEcho hyperEcho;
 	/// <summary>
 	/// Controller objects provide access to Sixense controllers data.
 	/// </summary>
@@ -346,7 +347,10 @@ public class SixenseInput : MonoBehaviour
 								var players = GameObject.FindGameObjectsWithTag("Player");
 								foreach(var p in players)
 									p.BroadcastMessage("enableSixense");
-									GameObject.Instantiate(ball, new Vector3(0,3,0), Quaternion.identity);
+
+
+                                hyperEcho.cube = GameObject.Instantiate(ball, new Vector3(128, 128, 128), Quaternion.identity) as GameObject;
+
 								break;
 							}
 						}

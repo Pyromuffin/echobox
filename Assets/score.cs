@@ -5,7 +5,7 @@ public class score : MonoBehaviour {
 	public GUIText friend;
 	public GameObject ball;
 	public GameObject explosion;
-	
+    public HyperEcho hyperEcho;
 	
 	public int scoreValue = 0;
 	
@@ -18,10 +18,10 @@ public class score : MonoBehaviour {
 	
 	IEnumerator makeBall(){
 		yield return new WaitForSeconds(5);
-		GameObject.Instantiate(ball, new Vector3(128,131,128), Quaternion.identity);
+		hyperEcho.cube = GameObject.Instantiate(ball, new Vector3(128,131,128), Quaternion.identity) as GameObject;
 		
 	}
-	/*
+	
 	void OnCollisionEnter(Collision other){
 		
 		if (other.gameObject.CompareTag("ball")){
@@ -37,7 +37,7 @@ public class score : MonoBehaviour {
 		}
 		
 	}
-	*/
+	
 	// Update is called once per frame
 	void Update () {
 	

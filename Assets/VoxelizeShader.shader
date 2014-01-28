@@ -2,7 +2,7 @@ Shader "Voxelize"
 {
 	Properties 
 	{
-	_Color(" Color", Color) = (0, 0, 0, 1) // color
+	_Emit ("Sound Emission", Vector) = (0,0,0,0)
 	}
 
 	SubShader 
@@ -44,7 +44,7 @@ Shader "Voxelize"
 
 				float4x4 zMVP;
 				RWTexture3D<float2> Media : register(u1);
-				float4 _Color;
+				float4 _Emit;
 				
 				// **************************************************************
 				// Shader Programs												*
@@ -112,8 +112,8 @@ Shader "Voxelize"
 					// 144, 144, 144 -> 256, 256, 256
 					// 128 + ( (world pos - 128 ) * 128/16 )
 					// 112-> 0
-					float3 relativePos = 128 + ((input.worldPos.xyz - 128) * 128 / 8);
-					Media[uint3(relativePos)] = _Color;
+					float3 relativePos = 128 + ((input.worldPos.xyz - 128) * 128 / 16);
+					Media[uint3(relativePos)] = 0;
 					
 					discard;
 					return float4(0,0,0,0);

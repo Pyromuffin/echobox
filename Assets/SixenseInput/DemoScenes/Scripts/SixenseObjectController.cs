@@ -49,7 +49,7 @@ public class SixenseObjectController : MonoBehaviour {
 	
 	void FixedUpdate(){
 		
-		velocity = (transform.position - oldPos)/Time.deltaTime;
+		velocity = (transform.position - oldPos)/Time.fixedDeltaTime;
 		oldPos = transform.position;	
 	}
 	

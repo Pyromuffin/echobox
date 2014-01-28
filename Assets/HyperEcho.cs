@@ -5,12 +5,13 @@ public class HyperEcho : MonoBehaviour {
     public RenderTexture current, previous, media, next, RMtex;
     public ComputeShader echoCompute;
     public Shader depthShader;
-    public float timeFactor, distanceStep, speedOfSound, damping, frequency, amplitude;
+    public float timeFactor, distanceStep, speedOfSound, damping, frequency, amplitude, hueDamp;
     private int phase = 0;
 	public int size = 256;
     private Raymarching raymarching;
     public bool VR = true;
-    public float hue;
+    public float huePower;
+    public GameObject cube;
 
 	// Use this for initialization
 	void Start () {
@@ -19,7 +20,7 @@ public class HyperEcho : MonoBehaviour {
         setupTexture3D(ref previous, "Previous");
         setupTexture3D(ref media, "Media");
         setupTexture3D(ref next, "Next");
-        setupRMTex3D(ref RMtex, "RayMarching");
+        //setupRMTex3D(ref RMtex, "RayMarching");
         
         var camroids = GetComponentsInChildren<Camera>();
         camroids[0].depthTextureMode = DepthTextureMode.Depth;
@@ -28,6 +29,7 @@ public class HyperEcho : MonoBehaviour {
 
         Voxelize.media = media;
 
+        InvokeRepeating("changeColor", 0, 1);
      
 	}
 
@@ -37,9 +39,10 @@ public class HyperEcho : MonoBehaviour {
         DestroyImmediate(tex);
 
         //make those buffers
-        tex = new RenderTexture(this.size, this.size, 0, RenderTextureFormat.ARGBFloat);
+        tex = new RenderTexture(this.size, this.size, 0, RenderTextureFormat.RGFloat);
 
         tex.enableRandomWrite = true;
+        tex.filterMode = FilterMode.Trilinear;
         tex.isVolume = true;
         tex.volumeDepth = size;
         tex.Create();
@@ -81,18 +84,19 @@ public class HyperEcho : MonoBehaviour {
         echoCompute.SetFloat("distanceStep", distanceStep);
         echoCompute.SetFloat("speedOfSound", speedOfSound);
         echoCompute.SetFloat("damping", damping);
-        echoCompute.SetVector("chaos", new Vector4(color.r, color.g, color.b, Mathf.Sin(Time.timeSinceLevelLoad * frequency)) * amplitude );
-        echoCompute.SetVector("chaos2", new Vector4(color2.r, color2.g, color2.b, -Mathf.Sin(Time.timeSinceLevelLoad * frequency)) * amplitude);
+        echoCompute.SetFloat("hueDamping", hueDamp);
+        echoCompute.SetVector("chaos", new Vector4(Mathf.Sin(Time.timeSinceLevelLoad * frequency) * amplitude, huePower)  );
+        if( cube)
+            echoCompute.SetVector("cubePosition", cube.transform.position);
 
         echoCompute.SetTexture(0, "Media", media);
-        echoCompute.SetTexture(0, "RayMarching", RMtex);
         if (phase == 0)
         {
             echoCompute.SetTexture(0, "Next", next);
             echoCompute.SetTexture(0, "Current", current );
             echoCompute.SetTexture(0, "Previous", previous );
             
-            //Shader.SetGlobalTexture("Current", next );
+            Shader.SetGlobalTexture("Current", next );
             phase++;
         }
         else if (phase == 1)
@@ -101,7 +105,7 @@ public class HyperEcho : MonoBehaviour {
             echoCompute.SetTexture(0, "Current", next);
             echoCompute.SetTexture(0, "Previous", current);
             
-            //Shader.SetGlobalTexture("Current", previous);
+            Shader.SetGlobalTexture("Current", previous);
             phase++;
         }
 
@@ -111,7 +115,7 @@ public class HyperEcho : MonoBehaviour {
             echoCompute.SetTexture(0, "Current", previous);
             echoCompute.SetTexture(0, "Previous", next);
             
-            //Shader.SetGlobalTexture("Current", current);
+            Shader.SetGlobalTexture("Current", current);
             phase = 0;
         }
         

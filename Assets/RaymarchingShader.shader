@@ -58,8 +58,9 @@
 				float4 cameraWorldSize;
 				float worldSize;
 				 
-				sampler3D RayMarching;
+				sampler3D Current;
 				sampler2D _CameraDepthTexture;
+
 			
 				float4 frag(v2f IN) : COLOR {
 				    
@@ -75,34 +76,29 @@
 				    float4 dst = float4(0, 0, 0, 0);
 				    float4 src = 0;
 				 
-				    float4 value = float4(0,0,0,0);
+				    float2 value = float2(0,0);
 				 
 				    float3 Step = dir * StepSize; 
 					
 					
-				    for(int i = 0; i < 100; i++)
+				    for(int i = 0; i < 200; i++)
 				    {
 				        
-						//128 128 128 -> .5, .5, .5g
-						//136, 136, 136 -> 1,1,1
-						//144 144 144 -> 1,1,1,
-						//16, 16, 16 -> 1 1 1
-						// 0 0 0 -> .5 .5 .5
-						// -16, -16, -16  -> 0 ,0, 0						
-						// ( (worldPos - 128) /32 ) +.5f
-						float4 relativePos =  ( (pos-128)	/16) + .5f;
+					
+						float4 relativePos =  ( (pos-128)	/32) + .5f;
 						relativePos.w = 0;
 
-				        value = tex3Dlod(RayMarching, relativePos );
+				        value = tex3Dlod(Current, relativePos ).rg;
  
-						//value.rgb = abs(value.rgb);	
-					
-						if (value.a != 0) 
-							value.a = abs(log(abs(value.a)));
+						
+						if (value.r != 0) 
+							value.r = abs(log(abs(value.r)));
 						else 
-							value.a = 0;
+							value.r = 0;
 					
-						src = value;
+						float3 rgb = hsv2rgb(float3(value.g,1,1))  ;
+						
+						src = float4(rgb,value.r);
 
 						src.a *= .001f; //reduce the alpha to have a more transparent result 
 				         

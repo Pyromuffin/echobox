@@ -51,6 +51,7 @@ public class OVRPlayerController : OVRComponent
 	protected CharacterController 	Controller 		 = null;
 	protected OVRCameraController 	CameraController = null;
 
+    public SixenseHands hand = SixenseHands.RIGHT;	
 	public float Acceleration 	   = 0.1f;
 	public float Damping 		   = 0.15f;
 	public float BackAndSideDampen = 0.5f;
@@ -82,7 +83,26 @@ public class OVRPlayerController : OVRComponent
 	private float YfromSensor2            = 0.0f;
 	
 	// * * * * * * * * * * * * *
+
+
+
+
+
+    SixenseInput.Controller rightHand, leftHand;
+    bool sixense = false;
+
+    public void enableSixense()
+    {
+
+
+        rightHand = SixenseInput.GetController(SixenseHands.RIGHT);
+        leftHand = SixenseInput.GetController(SixenseHands.LEFT);
+        sixense = true;
+
+    }
 	
+	
+
 	// Awake
 	new public virtual void Awake()
 	{
@@ -298,6 +318,15 @@ public class OVRPlayerController : OVRComponent
 				
 			float leftAxisX = 
 			OVRGamepadController.GPC_GetAxis((int)OVRGamepadController.Axis.LeftXAxis);
+
+            if (sixense)
+            {
+                
+                leftAxisX = SixenseInput.GetController(SixenseHands.RIGHT).JoystickX;
+                leftAxisY = SixenseInput.GetController(SixenseHands.RIGHT).JoystickY;
+
+            }
+            
 						
 			if(leftAxisY > 0.0f)
 	    		MoveThrottle += leftAxisY *

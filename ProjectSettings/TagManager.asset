@@ -4,6 +4,10 @@
 TagManager:
   tags:
   - 
+  - ball
+  - paddle
+  - song
+  - 
   Builtin Layer 0: Default
   Builtin Layer 1: TransparentFX
   Builtin Layer 2: Ignore Raycast
@@ -15,7 +19,7 @@ TagManager:
   User Layer 8: raymarching box
   User Layer 9: roof
   User Layer 10: walls
-  User Layer 11: 
+  User Layer 11: Don't voxelize
   User Layer 12: 
   User Layer 13: 
   User Layer 14: 

@@ -91,9 +91,11 @@ public class ball : MonoBehaviour {
             if (other.transform.forward.z > 0 && rigidbody.velocity.z < 0)
                 rigidbody.velocity = new Vector3(rigidbody.velocity.x, rigidbody.velocity.y, rigidbody.velocity.z * -1);
 
+            //rigidbody.AddForceAtPosition(direction * other.gameObject.GetComponent<SixenseObjectController>().velocity.magnitude * velocityScale, other.contacts[0].point);
 
 
-            rigidbody.velocity  += (other.gameObject.GetComponent<SixenseObjectController>().velocity * velocityScale);	
+            rigidbody.velocity  += (other.gameObject.GetComponent<SixenseObjectController>().velocity * velocityScale);
+            rigidbody.velocity = Vector3.ClampMagnitude(rigidbody.velocity, 25);
            
 		}
 		if(lastCollider != null)
@@ -104,7 +106,7 @@ public class ball : MonoBehaviour {
 		gameObject.audio.Play();
         
 
-		rigidbody.velocity  *= 1.1f;
+		rigidbody.velocity  *= 1.05f;
 		
 	}
 	
